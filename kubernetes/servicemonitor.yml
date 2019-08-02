@@ -1,0 +1,17 @@
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  labels:
+    app: prometheus-data-generator
+    prometheus: kube-prometheus
+  name: prometheus-data-generator
+  namespace: monitoring
+spec:
+  endpoints:
+  - interval: 60s
+    path: /metrics/
+    port: metrics
+  selector:
+    matchLabels:
+      app: prometheus-data-generator

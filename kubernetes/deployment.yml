@@ -1,0 +1,127 @@
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    app: prometheus-data-generator
+  name: prometheus-data-generator
+  namespace: monitoring
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: prometheus-data-generator
+  template:
+    metadata:
+      labels:
+        app: prometheus-data-generator
+    spec:
+      containers:
+      - image: alexperezpujol/prometheus-data-generator:0.1
+        imagePullPolicy: Always
+        env:
+        - name: PDG_CONFIG
+          value: /pdg/config.yml
+        name: prometheus-data-generator
+        ports:
+        - containerPort: 9000
+          protocol: TCP
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 9000
+            scheme: HTTP
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 9000
+            scheme: HTTP
+        resources:
+          limits:
+            cpu: 100m
+            memory: 100Mi
+          requests:
+            cpu: 50m
+            memory: 50Mi
+        volumeMounts:
+        - name: config
+          mountPath: /pdg/
+      - image: quay.io/coreos/configmap-reload:v0.0.1
+        args:
+        - -webhook-url=http://localhost:9000/-/reload
+        - -volume-dir=/pdg/
+        - -webhook-method=GET
+        name: config-reloader
+        resources:
+          limits:
+            cpu: 5m
+            memory: 10Mi
+          requests:
+            cpu: 5m
+            memory: 10Mi
+        volumeMounts:
+        - name: config
+          mountPath: /pdg/
+          readOnly: true
+      volumes:
+      - name: config
+        configMap:
+          name: prometheus-data-generator
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-data-generator
+  namespace: monitoring
+data:
+  config.yml: |
+    config:
+      - name: number_of_fruits
+        description: The number of fruits we have.
+        type: gauge
+        labels: [name, color]
+        sequence:
+          - time: 5
+            time_wait: 1
+            values: 0-20
+            operation: inc
+            labels:
+              name: apple
+              color: red
+          - time: 5
+            time_wait: 1
+            values: 0-20
+            operation: inc
+            labels:
+              name: apple
+              color: green
+          - time: 5
+            time_wait: 1
+            values: 0-5
+            operation: dec
+            labels:
+              name: apple
+              color: green
+          - time: 5
+            time_wait: 1
+            value: 3
+            operation: inc
+            labels:
+              name: apple
+              color: yellow
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: prometheus-data-generator
+  namespace: monitoring
+  labels:
+    app: prometheus-data-generator
+spec:
+  ports:
+  - port: 9000
+    protocol: TCP
+    targetPort: 9000
+    name: metrics
+  selector:
+    app: prometheus-data-generator
