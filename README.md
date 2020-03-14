@@ -99,7 +99,7 @@ The ones defined ![here](https://prometheus.io/docs/concepts/metric_types/).
 ## Manual use
 
 ```bash
-git clone https://github.com/alexppg/prometheus-data-generator.git
+git clone https://github.com/little-angry-clouds/prometheus-data-generator.git
 virtualenv -p python3 venv
 pip install -r requirements.txt
 python prometheus-data-generator/main.py
@@ -109,9 +109,9 @@ curl localhost:9000/metrics/
 ## Use in docker
 
 ``` bash
-wget https://raw.githubusercontent.com/alexppg/prometheus-data-generator/master/config.yml
+wget https://raw.githubusercontent.com/little-angry-clouds/prometheus-data-generator/master/config.yml
 docker run -ti -v `pwd`/config.yml:/config.yml -p 127.0.0.1:9000:9000 \
-    alexperezpujol/prometheus-data-generator
+    littleangryclouds/prometheus-data-generator
 curl localhost:9000/metrics/
 ```
 
