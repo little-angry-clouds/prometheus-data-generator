@@ -20,7 +20,6 @@ if "PDG_LOG_LEVEL" in environ:
             datefmt="%Y-%m-%d %H:%M:%S",
         )
         logger = logging.getLogger("prometheus-data-generator")
-        logger.info("Log level not supported, defaulting to INFO.")
     logging.basicConfig(
         format="%(asctime)s.%(msecs)03d %(levelname)s - %(funcName)s: %(message)s",
         datefmt="%Y-%m-%d %H:%M:%S",
@@ -139,11 +138,20 @@ class PrometheusDataGenerator:
                     if time.time() > timeout:
                         break
                     if "value" in sequence:
-                        value = int(sequence["value"])
+                        value = sequence["value"]
+                        if "." in value:
+                            value = float(value)
+                        else:
+                            value = int(value)
                     elif "values" in sequence:
-                        initial_value = int(sequence["values"].split("-")[0])
-                        end_value = int(sequence["values"].split("-")[1])
-                        value = random.randrange(initial_value, end_value)
+                        if "." in sequence["values"].split("-")[0]:
+                            initial_value = float(sequence["values"].split("-")[0])
+                            end_value = float(sequence["values"].split("-")[1])
+                            value = random.uniform(initial_value, end_value)
+                        else:
+                            initial_value = int(sequence["values"].split("-")[0])
+                            end_value = int(sequence["values"].split("-")[1])
+                            value = random.randrange(initial_value, end_value)
                     if metric_metadata["type"].lower() == "gauge":
                         try:
                             operation = sequence["operation"].lower()
