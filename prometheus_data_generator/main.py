@@ -128,11 +128,11 @@ class PrometheusDataGenerator:
                     labels = [key for key in sequence["labels"].values()]
                 else:
                     labels = []
-                timeout = time.time() + sequence["time"]
+                timeout = time.time() + sequence["eval_time"]
                 logger.debug(
                     "Changing sequence in {} metric".format(metric_metadata["name"])
                 )
-                time_wait = sequence["time_wait"]
+                interval = sequence["interval"]
                 while True:
                     if self.stopped:
                         break
@@ -182,7 +182,7 @@ class PrometheusDataGenerator:
                             metric_object.observe(value)
                         else:
                             metric_object.labels(*labels).observe(value)
-                    time.sleep(time_wait)
+                    time.sleep(interval)
 
     def serve_metrics(self):
         """
