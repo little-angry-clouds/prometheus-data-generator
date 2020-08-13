@@ -1,5 +1,5 @@
 ---
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
@@ -17,7 +17,7 @@ spec:
         app: prometheus-data-generator
     spec:
       containers:
-      - image: alexperezpujol/prometheus-data-generator:0.1
+      - image: littleangryclouds/prometheus-data-generator
         imagePullPolicy: Always
         env:
         - name: PDG_CONFIG
