@@ -27,28 +27,28 @@ config:
     labels: [name, color]
     sequence:
       - time: 5
-        time_wait: 1
+        eval_time: 5
         values: 0-20
         operation: inc
         labels:
           name: apple
           color: red
       - time: 5
-        time_wait: 1
+        eval_time: 5
         values: 0-20
         operation: inc
         labels:
           name: apple
           color: green
       - time: 5
-        time_wait: 1
+        eval_time: 5
         values: 0-5
         operation: dec
         labels:
           name: apple
           color: green
       - time: 5
-        time_wait: 1
+        eval_time: 5
         value: 3
         operation: inc
         labels:
