@@ -27,28 +27,28 @@ config:
     labels: [name, color]
     sequence:
       - time: 5
-        time_wait: 1
+        eval_time: 5
         values: 0-20
         operation: inc
         labels:
           name: apple
           color: red
       - time: 5
-        time_wait: 1
+        eval_time: 5
         values: 0-20
         operation: inc
         labels:
           name: apple
           color: green
       - time: 5
-        time_wait: 1
+        eval_time: 5
         values: 0-5
         operation: dec
         labels:
           name: apple
           color: green
       - time: 5
-        time_wait: 1
+        eval_time: 5
         value: 3
         operation: inc
         labels:
@@ -75,15 +75,15 @@ number_of_fruits{color="yellow",name="apple"} 4.0
   types.  [**Type**: string] [**Required**]
 - `labels`: The labels that will be used with the metric. [**Type**: list of
   strings] [**Optional**]
-- `sequence.time`: Number of seconds that the sequence will be running.
+- `sequence.eval_time`: Number of seconds that the sequence will be running.
   [**Type**: int] [**Required**]
-- `sequence.time_wait`: The interval of seconds between each operation will be
+- `sequence.interval`: The interval of seconds between each operation will be
   performed. 1 second is a sane number. [**Type**: int] [**Required**]
 - `sequence.value`: The value that the operation will apply. It must be a single
   value. You must choose between `value` and `values`. [**Type**: int] [**Optional**]
 - `sequence.values`: The range of values that will randomly be choosed and the
   operation will apply. It must be two values separed by a dash. You must choose
-  between `value` and `values`. [**Type**: string (int-int)] [**Optional**]
+  between `value` and `values`. [**Type**: string (int-int / float-float)] [**Optional**]
 - `sequence.operation`: The operation that will be applied. It only will be used
   with the gauge type, and you can choose between `inc`, `dec` or `set`. [**Optional**]
 - `sequence.labels`: The labels of the sequence. They must be used if `labels`

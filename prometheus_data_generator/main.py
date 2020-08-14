@@ -10,11 +10,29 @@ from flask import Flask, Response
 from prometheus_client import Gauge, Counter, Summary, Histogram
 from prometheus_client import generate_latest, CollectorRegistry
 
-logging.basicConfig(
-    level=logging.ERROR,
-    format="%(asctime)s.%(msecs)03d %(levelname)s - %(funcName)s: %(message)s",
-    datefmt="%Y-%m-%d %H:%M:%S",
-)
+
+if "PDG_LOG_LEVEL" in environ:
+    supported_log_levels = ["INFO", "ERROR", "DEBUG"]
+    if environ["PDG_LOG_LEVEL"].upper() not in supported_log_levels:
+        logging.basicConfig(
+            level=logging.INFO,
+            format="%(asctime)s.%(msecs)03d %(levelname)s - %(funcName)s: %(message)s",
+            datefmt="%Y-%m-%d %H:%M:%S",
+        )
+        logger = logging.getLogger("prometheus-data-generator")
+    logging.basicConfig(
+        format="%(asctime)s.%(msecs)03d %(levelname)s - %(funcName)s: %(message)s",
+        datefmt="%Y-%m-%d %H:%M:%S",
+    )
+    logger = logging.getLogger("prometheus-data-generator")
+    logger.setLevel(environ["PDG_LOG_LEVEL"].upper())
+else:
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s.%(msecs)03d %(levelname)s - %(funcName)s: %(message)s",
+        datefmt="%Y-%m-%d %H:%M:%S",
+    )
+    logger = logging.getLogger("prometheus-data-generator")
 
 
 def read_configuration():
@@ -109,27 +127,36 @@ class PrometheusDataGenerator:
                     labels = [key for key in sequence["labels"].values()]
                 else:
                     labels = []
-                timeout = time.time() + sequence["time"]
-                logging.info(
+                timeout = time.time() + sequence["eval_time"]
+                logger.debug(
                     "Changing sequence in {} metric".format(metric_metadata["name"])
                 )
-                time_wait = sequence["time_wait"]
+                interval = sequence["interval"]
                 while True:
                     if self.stopped:
                         break
                     if time.time() > timeout:
                         break
                     if "value" in sequence:
-                        value = int(sequence["value"])
+                        value = sequence["value"]
+                        if "." in value:
+                            value = float(value)
+                        else:
+                            value = int(value)
                     elif "values" in sequence:
-                        initial_value = int(sequence["values"].split("-")[0])
-                        end_value = int(sequence["values"].split("-")[1])
-                        value = random.randrange(initial_value, end_value)
+                        if "." in sequence["values"].split("-")[0]:
+                            initial_value = float(sequence["values"].split("-")[0])
+                            end_value = float(sequence["values"].split("-")[1])
+                            value = random.uniform(initial_value, end_value)
+                        else:
+                            initial_value = int(sequence["values"].split("-")[0])
+                            end_value = int(sequence["values"].split("-")[1])
+                            value = random.randrange(initial_value, end_value)
                     if metric_metadata["type"].lower() == "gauge":
                         try:
                             operation = sequence["operation"].lower()
                         except:
-                            logging.error(
+                            logger.error(
                                 "You must set an operation when using Gauge"
                             )
                             _exit(1)
@@ -163,7 +190,7 @@ class PrometheusDataGenerator:
                             metric_object.observe(value)
                         else:
                             metric_object.labels(*labels).observe(value)
-                    time.sleep(time_wait)
+                    time.sleep(interval)
 
     def serve_metrics(self):
         """
@@ -198,7 +225,7 @@ class PrometheusDataGenerator:
             for thread in self.threads:
                 thread.join()
             self.init_metrics()
-            logging.info("Configuration reloaded")
+            logger.info("Configuration reloaded. Metrics will be restarted.")
             return Response("OK")
 
     def run_webserver(self):
@@ -209,6 +236,7 @@ class PrometheusDataGenerator:
             target=self.app.run,
             kwargs={"port": "9000", "host": "0.0.0.0"}
         ).start()
+
 
 if __name__ == "__main__":
     PROM = PrometheusDataGenerator()
