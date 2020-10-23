@@ -99,6 +99,11 @@ class PrometheusDataGenerator:
                     labels,
                     registry=self.registry
                 )
+            else:
+                logger.warning(
+                    "Unknown metric type {type} for metric {name}, ignoring.".format(**metric)
+                )
+
             t = threading.Thread(
                 target=self.update_metrics,
                 args=(instrument, metric)
@@ -123,26 +128,47 @@ class PrometheusDataGenerator:
             for sequence in metric_metadata["sequence"]:
                 if self.stopped:
                     break
+
                 if "labels" in sequence:
                     labels = [key for key in sequence["labels"].values()]
                 else:
                     labels = []
-                timeout = time.time() + sequence["eval_time"]
+
+                if "eval_time" in sequence:
+                    timeout = time.time() + sequence["eval_time"]
+                else:
+                    logger.warning(
+                        "eval_time for metric {} not set, setting default to 1.".format(metric_metadata["name"])
+                    )
+                    timeout = time.time() + 1
+
+
                 logger.debug(
                     "Changing sequence in {} metric".format(metric_metadata["name"])
                 )
-                interval = sequence["interval"]
+
+                if "interval" in sequence:
+                    interval = sequence["interval"]
+                else:
+                    logger.warning(
+                        "interval for metric {} not set, setting default to 1.".format(metric_metadata["name"])
+                    )
+                    interval = 1
+
                 while True:
                     if self.stopped:
                         break
+
                     if time.time() > timeout:
                         break
+
                     if "value" in sequence:
                         value = sequence["value"]
-                        if "." in value:
+                        if isinstance(value, float):
                             value = float(value)
                         else:
                             value = int(value)
+
                     elif "values" in sequence:
                         if "." in sequence["values"].split("-")[0]:
                             initial_value = float(sequence["values"].split("-")[0])
@@ -152,6 +178,7 @@ class PrometheusDataGenerator:
                             initial_value = int(sequence["values"].split("-")[0])
                             end_value = int(sequence["values"].split("-")[1])
                             value = random.randrange(initial_value, end_value)
+
                     if metric_metadata["type"].lower() == "gauge":
                         try:
                             operation = sequence["operation"].lower()
@@ -175,6 +202,7 @@ class PrometheusDataGenerator:
                                 metric_object.set(value)
                             else:
                                 metric_object.labels(*labels).set(value)
+
                     elif metric_metadata["type"].lower() == "counter":
                         if labels == []:
                             metric_object.inc(value)

@@ -8,7 +8,11 @@ config:
       - time: 5
         values: 0-20
         operation: inc
+        labels:
+          name: apple
+          color: red
       - eval_time: 5
+        operation: set
         labels:
           name: apple
           color: red
