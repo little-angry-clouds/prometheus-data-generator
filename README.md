@@ -131,8 +131,9 @@ operator](https://github.com/coreos/prometheus-operator).
 You may deploy the manifests:
 
 ``` bash
-kubectl apply -f kubernetes/ -n monitoring
-kubectl port-forward service/prometheus-data-generator 9000:9000
+kubectl create namespace prom-data-gen
+kubectl -n prom-data-gen apply -f kubernetes/
+kubectl -n prom-data-gen port-forward service/prometheus-data-generator 9000:9000
 curl localhost:9000/metrics/
 ```
 
