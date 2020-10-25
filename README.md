@@ -1,7 +1,9 @@
 # prometheus-data-generator
+
 Creates arbitrary prometheus metrics.
 
 ## Why use this?
+
 When creating Grafana dashboards or Prometheus alerts, it is common to make
 mistakes. You define a threshold that they have to meet, but when modified the
 next time you may forget those thresholds.
@@ -16,6 +18,7 @@ For example, you'll be able to create a alarm called `http_requests` with the
 labels `{path=/login/, return_code=200}` which will be updated as you wish.
 
 ## Configuration
+
 There's an example configuration file called `config.yml` in the root of the
 repository. It has the next format:
 
@@ -65,6 +68,7 @@ number_of_fruits{color="yellow",name="apple"} 4.0
 ```
 
 ### Supported keywords
+
 - `name`: The ![metric
   name](https://prometheus.io/docs/instrumenting/writing_clientlibs/#metric-names).
   [**Type**: string] [**Required**]
@@ -90,6 +94,7 @@ number_of_fruits{color="yellow",name="apple"} 4.0
   are declared. [**Optional**]
 
 ### Supported metric types
+
 The ones defined ![here](https://prometheus.io/docs/concepts/metric_types/).
 - Counter
 - Gauge
@@ -102,7 +107,7 @@ The ones defined ![here](https://prometheus.io/docs/concepts/metric_types/).
 git clone https://github.com/little-angry-clouds/prometheus-data-generator.git
 virtualenv -p python3 venv
 pip install -r requirements.txt
-python prometheus-data-generator/main.py
+python prometheus_data_generator/main.py
 curl localhost:9000/metrics/
 ```
 
@@ -116,6 +121,7 @@ curl localhost:9000/metrics/
 ```
 
 ## Use in kubernetes
+
 There's some example manifests in the `kubernetes` directory. There's defined a
 service, configmap, deployment (with
 ![configmap-reload](https://github.com/jimmidyson/configmap-reload) configured)
@@ -125,8 +131,9 @@ operator](https://github.com/coreos/prometheus-operator).
 You may deploy the manifests:
 
 ``` bash
-kubectl apply -f kubernetes/ -n monitoring
-kubectl port-forward service/prometheus-data-generator 9000:9000
+kubectl create namespace prom-data-gen
+kubectl -n prom-data-gen apply -f kubernetes/
+kubectl -n prom-data-gen port-forward service/prometheus-data-generator 9000:9000
 curl localhost:9000/metrics/
 ```
 
@@ -134,7 +141,9 @@ You can edit the configmap as you wish and the configmap-reload will
 eventually reload the configuration without killing the pod.
 
 ## Generate prometheus alerts unit tests
+
 TODO
 
 ## Tests
+
 TODO

@@ -5,7 +5,6 @@ metadata:
   labels:
     app: prometheus-data-generator
   name: prometheus-data-generator
-  namespace: monitoring
 spec:
   replicas: 1
   selector:
@@ -17,8 +16,8 @@ spec:
         app: prometheus-data-generator
     spec:
       containers:
-      - image: littleangryclouds/prometheus-data-generator:0.1
-        imagePullPolicy: Always
+      - image: littleangryclouds/prometheus-data-generator:0.2
+        imagePullPolicy: IfNotPresent
         env:
         - name: PDG_CONFIG
           value: /pdg/config.yml
@@ -67,61 +66,3 @@ spec:
       - name: config
         configMap:
           name: prometheus-data-generator
----
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: prometheus-data-generator
-  namespace: monitoring
-data:
-  config.yml: |
-    config:
-      - name: number_of_fruits
-        description: The number of fruits we have.
-        type: gauge
-        labels: [name, color]
-        sequence:
-          - time: 5
-            time_wait: 1
-            values: 0-20
-            operation: inc
-            labels:
-              name: apple
-              color: red
-          - time: 5
-            time_wait: 1
-            values: 0-20
-            operation: inc
-            labels:
-              name: apple
-              color: green
-          - time: 5
-            time_wait: 1
-            values: 0-5
-            operation: dec
-            labels:
-              name: apple
-              color: green
-          - time: 5
-            time_wait: 1
-            value: 3
-            operation: inc
-            labels:
-              name: apple
-              color: yellow
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: prometheus-data-generator
-  namespace: monitoring
-  labels:
-    app: prometheus-data-generator
-spec:
-  ports:
-  - port: 9000
-    protocol: TCP
-    targetPort: 9000
-    name: metrics
-  selector:
-    app: prometheus-data-generator

@@ -5,11 +5,13 @@ metadata:
   labels:
     app: prometheus-data-generator
     prometheus: kube-prometheus
+    # this label is needed in case of using default kube-prometheus-stack helm chart
+    # so that prometheus picks this up
+    app.kubernetes.io/managed-by: Helm
   name: prometheus-data-generator
-  namespace: monitoring
 spec:
   endpoints:
-  - interval: 60s
+  - interval: 10s
     path: /metrics/
     port: metrics
   selector:
