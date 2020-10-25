@@ -16,7 +16,7 @@ spec:
         app: prometheus-data-generator
     spec:
       containers:
-      - image: quay.io/kaszpir/prometheus-data-generator:fixes
+      - image: littleangryclouds/prometheus-data-generator:0.2
         imagePullPolicy: IfNotPresent
         env:
         - name: PDG_CONFIG
