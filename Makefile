@@ -20,10 +20,10 @@ test:
 	docker run --name test-prometheus-data-generator --tty -v `pwd`:/tox --rm \
 		alexperezpujol/tox:latest tox
 
-build:
-	docker build -t littleangryclouds/prometheus-data-generator --target production .
+docker-build:
+	docker build -t littleangryclouds/prometheus-data-generator .
 
-push:
+docker-push:
 	@docker tag littleangryclouds/prometheus-data-generator:latest littleangryclouds/prometheus-data-generator:$(VERSION)
 	@docker push littleangryclouds/prometheus-data-generator:latest
 	@docker push littleangryclouds/prometheus-data-generator:$(VERSION)
