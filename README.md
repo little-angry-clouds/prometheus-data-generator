@@ -69,14 +69,14 @@ number_of_fruits{color="yellow",name="apple"} 4.0
 
 ### Supported keywords
 
-- `name`: The ![metric
+- `name`: The [metric
   name](https://prometheus.io/docs/instrumenting/writing_clientlibs/#metric-names).
   [**Type**: string] [**Required**]
 - `description`: The description to be shown as
-  ![HELP](https://prometheus.io/docs/instrumenting/writing_clientlibs/#metric-description-and-help).
+  [HELP](https://prometheus.io/docs/instrumenting/writing_clientlibs/#metric-description-and-help).
   [**Type**: string] [**Required**]
-- `type`: It should be one of the ![supported](###supported-metric-types) metric
-  types.  [**Type**: string] [**Required**]
+- `type`: It should be one of the supported metric types, which you can see in the next section.
+  [**Type**: string] [**Required**]
 - `labels`: The labels that will be used with the metric. [**Type**: list of
   strings] [**Optional**]
 - `sequence.eval_time`: Number of seconds that the sequence will be running.
