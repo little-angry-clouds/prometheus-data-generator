@@ -95,7 +95,7 @@ number_of_fruits{color="yellow",name="apple"} 4.0
 
 ### Supported metric types
 
-The ones defined ![here](https://prometheus.io/docs/concepts/metric_types/).
+The ones defined [here](https://prometheus.io/docs/concepts/metric_types/).
 - Counter
 - Gauge
 - Histogram
@@ -124,8 +124,8 @@ curl localhost:9000/metrics/
 
 There's some example manifests in the `kubernetes` directory. There's defined a
 service, configmap, deployment (with
-![configmap-reload](https://github.com/jimmidyson/configmap-reload) configured)
-and a Service Monitor to be used with the ![prometheus
+[configmap-reload](https://github.com/jimmidyson/configmap-reload) configured)
+and a Service Monitor to be used with the [prometheus
 operator](https://github.com/coreos/prometheus-operator).
 
 You may deploy the manifests:
